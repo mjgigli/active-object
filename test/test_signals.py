@@ -40,6 +40,8 @@ class test_signals(unittest.TestCase):
         self.cb4 = 0
         self.cb5 = 0
         self.cb6 = 0
+        self.cb_arg1 = None
+        self.cb_arg2 = None
 
     def tearDown(self):
         dispatcher.unsubscribe_all()
@@ -64,6 +66,10 @@ class test_signals(unittest.TestCase):
         self.cb5 = 5
         self.cb6 = 6
 
+    def callback_args(self, arg1, arg2=None):
+        self.cb_arg1 = arg1
+        self.cb_arg2 = arg2
+
     def test_one_receiver(self):
         # verify test class members are reset
         self.assertEqual(self.cb1, 0)
@@ -76,6 +82,22 @@ class test_signals(unittest.TestCase):
 
         # verify callback was called
         self.assertEqual(self.cb1, 1)
+
+    def test_arguments(self):
+        # verify test class members are reset
+        self.assertEqual(self.cb_arg1, None)
+        self.assertEqual(self.cb_arg2, None)
+
+        # subscribe to the cbarg_sig signal
+        dispatcher.subscribe('cbarg_sig', self.callback_args)
+
+        # publish the signal to call the callback
+        dispatcher.publish('cbarg_sig', 'arg1', arg2='arg2')
+
+        # verify callback was called
+        self.assertEqual(self.cb_arg1, 'arg1')
+        self.assertEqual(self.cb_arg2, 'arg2')
+
 
     def test_multiple_receivers(self):
         # verify test class members are reset
