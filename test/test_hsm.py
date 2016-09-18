@@ -43,13 +43,16 @@ class test(hsm):
             self.inited.append(test)
 
             self.initial_transition(s2)
+            return
         elif evt == Entry:
             self.inited = []
             self.entered = []
             self.exited = []
             self.entered.append(test)
+            return
         elif evt == Exit:
             self.exited.append(test)
+            return
 
 
 class s(test):
@@ -57,17 +60,23 @@ class s(test):
         if evt == Init:
             self.inited.append(s)
             self.initial_transition(s11)
+            return
         elif evt == Entry:
             self.entered.append(s)
+            return
         elif evt == Exit:
             self.exited.append(s)
+            return
         elif evt == 'e':
             self.transition(s11)
+            return
         elif evt == 'i':
             if self.foo is True:
                 self.foo = False
-        else:
-            return Super
+                return
+
+        # always return Super for unhandled events
+        return Super
 
 
 class s1(s):
@@ -75,46 +84,62 @@ class s1(s):
         if evt == Init:
             self.inited.append(s1)
             self.initial_transition(s11)
+            return
         elif evt == Entry:
             self.entered.append(s1)
+            return
         elif evt == Exit:
             self.exited.append(s1)
+            return
         elif evt == 'a':
             self.transition(s1)
+            return
         elif evt == 'b':
             self.transition(s11)
+            return
         elif evt == 'c':
             self.transition(s2)
+            return
         elif evt == 'd':
             if self.foo is False:
                 self.foo = True
                 self.transition(s)
+                return
         elif evt == 'f':
             self.transition(s211)
+            return
         elif evt == 'i':
-            pass
-        else:
-            return Super
+            return
+
+        # always return Super for unhandled events
+        return Super
 
 
 class s11(s1):
     def state_handler(self, evt):
         if evt == Init:
             self.inited.append(s11)
+            return
         elif evt == Entry:
             self.entered.append(s11)
+            return
         elif evt == Exit:
             self.exited.append(s11)
+            return
         elif evt == 'd':
             if self.foo is True:
                 self.foo = False
                 self.transition(s1)
+                return
         elif evt == 'g':
             self.transition(s211)
+            return
         elif evt == 'h':
             self.transition(s)
-        else:
-            return Super
+            return
+
+        # always return Super for unhandled events
+        return Super
 
 
 class s2(s):
@@ -122,19 +147,26 @@ class s2(s):
         if evt == Init:
             self.inited.append(s2)
             self.initial_transition(s211)
+            return
         elif evt == Entry:
             self.entered.append(s2)
+            return
         elif evt == Exit:
             self.exited.append(s2)
+            return
         elif evt == 'c':
             self.transition(s1)
+            return
         elif evt == 'f':
             self.transition(s11)
+            return
         elif evt == 'i':
             if self.foo is False:
                 self.foo = True
-        else:
-            return Super
+                return
+
+        # always return Super for unhandled events
+        return Super
 
 
 class s21(s2):
@@ -142,32 +174,47 @@ class s21(s2):
         if evt == Init:
             self.inited.append(s21)
             self.initial_transition(s211)
+            return
         elif evt == Entry:
             self.entered.append(s21)
+            return
         elif evt == Exit:
             self.exited.append(s21)
+            return
         elif evt == 'a':
             self.transition(s21)
+            return
         elif evt == 'b':
             self.transition(s211)
+            return
         elif evt == 'g':
             self.transition(s11)
-        else:
-            return Super
+            return
+
+        # always return Super for unhandled events
+        return Super
 
 
 class s211(s21):
     def state_handler(self, evt):
         if evt == Init:
             self.inited.append(s211)
+            return
         elif evt == Entry:
             self.entered.append(s211)
+            return
         elif evt == Exit:
             self.exited.append(s211)
+            return
         elif evt == 'd':
             self.transition(s21)
+            return
         elif evt == 'h':
             self.transition(s)
+            return
+
+        # always return Super for unhandled events
+        return Super
 
 
 def start_in_state(hsm_h, state):
@@ -238,3 +285,8 @@ class test_hsm(unittest.TestCase):
         self.assertListEqual(self.test.inited, [s211])
         self.assertListEqual(self.test.entered, [s2, s21, s211])
         self.assertListEqual(self.test.exited, [s11, s1])
+
+    def test_many_dispatches(self):
+        print 'Starting many inputs test'
+        for evt in 'giaddceegii':
+            self.test.dispatch(evt)
