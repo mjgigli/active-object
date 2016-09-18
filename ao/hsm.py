@@ -58,6 +58,11 @@ class Super(object):
 ###############################################################################
 class hsm(object):
     """Base class to inherit from to create a HSM."""
+    Init = Init
+    Entry = Entry
+    Exit = Exit
+    Super = Super
+
     def __init__(self):
         """Dispatch Entry and Init signals at HSM creation."""
         self.state_handler(Entry)
