@@ -38,6 +38,12 @@ from Queue import Empty, Full
 from tornado.ioloop import IOLoop
 
 from hsm import hsm
+from signals import dispatcher
+
+
+def publish(evt):
+    """Publish the given event to all subscribed hsms."""
+    dispatcher.publish(evt.sig, evt)
 
 
 class ao(hsm):
@@ -54,6 +60,9 @@ class ao(hsm):
         self._evt_q = Queue()
         self._io_loop = io_loop
 
+        # always subscribe to Stop events
+        self.subscribe([self.Stop()])
+
         # monitor the event queue for events
         self._io_loop.add_handler(self._evt_q._reader.fileno(),
                                   self._evt_handler,
@@ -68,8 +77,29 @@ class ao(hsm):
         # dispatch event to ao's hsm
         self.dispatch(evt)
 
+        # cleanup if event was a stop event
+        if evt.sig == self.Stop:
+            self._cleanup()
+
+    def _cleanup(self):
+        self.unsubscribe([self.Stop()])
+        self.io_loop.remove_handler(self.evt_q._reader.fileno())
+
+    def stop(self):
+        self.post(self.Stop())
+
     def post(self, evt):
         try:
             self._evt_q.put_nowait(evt)
         except Full:
             logging.error("Active object event queue is full, dropping event.")
+
+    def subscribe(self, evts):
+        """Subscribe to all events passed in."""
+        for evt in evts:
+            dispatcher.subscribe(evt, self.post)
+
+    def unsubscribe(self, evts):
+        """Unsubscribe to all events passed in."""
+        for evt in evts:
+            dispatcher.unsubscribe(evt, self.post)

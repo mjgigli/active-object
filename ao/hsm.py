@@ -56,6 +56,11 @@ class Super(event):
     pass
 
 
+class Stop(event):
+    """Stop signal to stop an HSM."""
+    pass
+
+
 ###############################################################################
 class hsm(object):
     """Base class to inherit from to create a HSM."""
@@ -63,11 +68,15 @@ class hsm(object):
     Entry = Entry
     Exit = Exit
     Super = Super
+    Stop = Stop
 
     def __init__(self):
         """Dispatch Entry and Init signals at HSM creation."""
         self.state_handler(Entry())
         self.state_handler(Init())
+
+    def __del__(self):
+        self.state_handler(Stop())
 
     def __repr__(self):
         return '%s()' % self.__class__.__name__

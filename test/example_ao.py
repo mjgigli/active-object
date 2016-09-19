@@ -37,9 +37,15 @@ class test_evt(ao.event):
         self.arg = arg
 
 
+test_events = [
+    test_evt,
+]
+
+
 class test(ao.ao):
     def __init__(self, io_loop, cb=None):
         super(test, self).__init__(io_loop)
+
         self.cb = cb
 
     def state_handler(self, evt):
@@ -48,8 +54,12 @@ class test(ao.ao):
             return
         elif evt.sig == self.Entry:
             # any ao initialization can go here
+            self.subscribe(test_events)
             self.foo = False
             return
+        elif evt.sig == self.Stop:
+            # any ao destruction can go here
+            self.unsubscribe(test_events)
 
 
 class s(test):

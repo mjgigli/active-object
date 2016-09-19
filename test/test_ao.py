@@ -30,6 +30,7 @@
 
 from tornado import testing
 
+import ao
 from example_ao import test_evt, test
 
 
@@ -38,6 +39,13 @@ class test_ao(testing.AsyncTestCase):
         super(test_ao, self).setUp()
 
         self.test = test(self.io_loop, self.evt_cb)
+
+    def tearDown(self):
+        # we can't post the Stop event, because the io_loop is already stopped
+        # at this point, which means we can't write to the evt_q handler.
+        self.test.dispatch(self.test.Stop())
+
+        super(test_ao, self).tearDown()
 
     def evt_cb(self, evt):
         self.stop(evt)
@@ -49,6 +57,12 @@ class test_ao(testing.AsyncTestCase):
     def test_direct_post(self):
         # verify that posting to event queue triggers ao's hsm
         self.test.post(test_evt('i'))
+
+        evt = self.wait()
+        self.assertEqual(evt.arg, 'i')
+
+    def test_publish(self):
+        ao.publish(test_evt('i'))
 
         evt = self.wait()
         self.assertEqual(evt.arg, 'i')
