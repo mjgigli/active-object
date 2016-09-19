@@ -31,44 +31,51 @@
 import ao
 
 
+class test_evt(ao.event):
+    def __init__(self, arg):
+        super(test_evt, self).__init__()
+        self.arg = arg
+
+
 class test(ao.hsm):
     def state_handler(self, evt):
-        if evt == self.Init:
+        if evt.sig == self.Init:
             self.foo = False
             self.inited.append(test)
 
             self.initial_transition(s2)
             return
-        elif evt == self.Entry:
+        elif evt.sig == self.Entry:
             self.inited = []
             self.entered = []
             self.exited = []
             self.entered.append(test)
             return
-        elif evt == self.Exit:
+        elif evt.sig == self.Exit:
             self.exited.append(test)
             return
 
 
 class s(test):
     def state_handler(self, evt):
-        if evt == self.Init:
+        if evt.sig == self.Init:
             self.inited.append(s)
             self.initial_transition(s11)
             return
-        elif evt == self.Entry:
+        elif evt.sig == self.Entry:
             self.entered.append(s)
             return
-        elif evt == self.Exit:
+        elif evt.sig == self.Exit:
             self.exited.append(s)
             return
-        elif evt == 'e':
-            self.transition(s11)
-            return
-        elif evt == 'i':
-            if self.foo is True:
-                self.foo = False
+        elif evt.sig == test_evt:
+            if evt.arg == 'e':
+                self.transition(s11)
                 return
+            elif evt.arg == 'i':
+                if self.foo is True:
+                    self.foo = False
+                    return
 
         # always return self.Super for unhandled events
         return self.Super
@@ -76,35 +83,36 @@ class s(test):
 
 class s1(s):
     def state_handler(self, evt):
-        if evt == self.Init:
+        if evt.sig == self.Init:
             self.inited.append(s1)
             self.initial_transition(s11)
             return
-        elif evt == self.Entry:
+        elif evt.sig == self.Entry:
             self.entered.append(s1)
             return
-        elif evt == self.Exit:
+        elif evt.sig == self.Exit:
             self.exited.append(s1)
             return
-        elif evt == 'a':
-            self.transition(s1)
-            return
-        elif evt == 'b':
-            self.transition(s11)
-            return
-        elif evt == 'c':
-            self.transition(s2)
-            return
-        elif evt == 'd':
-            if self.foo is False:
-                self.foo = True
-                self.transition(s)
+        elif evt.sig == test_evt:
+            if evt.arg == 'a':
+                self.transition(s1)
                 return
-        elif evt == 'f':
-            self.transition(s211)
-            return
-        elif evt == 'i':
-            return
+            elif evt.arg == 'b':
+                self.transition(s11)
+                return
+            elif evt.arg == 'c':
+                self.transition(s2)
+                return
+            elif evt.arg == 'd':
+                if self.foo is False:
+                    self.foo = True
+                    self.transition(s)
+                    return
+            elif evt.arg == 'f':
+                self.transition(s211)
+                return
+            elif evt.arg == 'i':
+                return
 
         # always return self.Super for unhandled events
         return self.Super
@@ -112,26 +120,27 @@ class s1(s):
 
 class s11(s1):
     def state_handler(self, evt):
-        if evt == self.Init:
+        if evt.sig == self.Init:
             self.inited.append(s11)
             return
-        elif evt == self.Entry:
+        elif evt.sig == self.Entry:
             self.entered.append(s11)
             return
-        elif evt == self.Exit:
+        elif evt.sig == self.Exit:
             self.exited.append(s11)
             return
-        elif evt == 'd':
-            if self.foo is True:
-                self.foo = False
-                self.transition(s1)
+        elif evt.sig == test_evt:
+            if evt.arg == 'd':
+                if self.foo is True:
+                    self.foo = False
+                    self.transition(s1)
+                    return
+            elif evt.arg == 'g':
+                self.transition(s211)
                 return
-        elif evt == 'g':
-            self.transition(s211)
-            return
-        elif evt == 'h':
-            self.transition(s)
-            return
+            elif evt.arg == 'h':
+                self.transition(s)
+                return
 
         # always return self.Super for unhandled events
         return self.Super
@@ -139,26 +148,27 @@ class s11(s1):
 
 class s2(s):
     def state_handler(self, evt):
-        if evt == self.Init:
+        if evt.sig == self.Init:
             self.inited.append(s2)
             self.initial_transition(s211)
             return
-        elif evt == self.Entry:
+        elif evt.sig == self.Entry:
             self.entered.append(s2)
             return
-        elif evt == self.Exit:
+        elif evt.sig == self.Exit:
             self.exited.append(s2)
             return
-        elif evt == 'c':
-            self.transition(s1)
-            return
-        elif evt == 'f':
-            self.transition(s11)
-            return
-        elif evt == 'i':
-            if self.foo is False:
-                self.foo = True
+        elif evt.sig == test_evt:
+            if evt.arg == 'c':
+                self.transition(s1)
                 return
+            elif evt.arg == 'f':
+                self.transition(s11)
+                return
+            elif evt.arg == 'i':
+                if self.foo is False:
+                    self.foo = True
+                    return
 
         # always return self.Super for unhandled events
         return self.Super
@@ -166,25 +176,26 @@ class s2(s):
 
 class s21(s2):
     def state_handler(self, evt):
-        if evt == self.Init:
+        if evt.sig == self.Init:
             self.inited.append(s21)
             self.initial_transition(s211)
             return
-        elif evt == self.Entry:
+        elif evt.sig == self.Entry:
             self.entered.append(s21)
             return
-        elif evt == self.Exit:
+        elif evt.sig == self.Exit:
             self.exited.append(s21)
             return
-        elif evt == 'a':
-            self.transition(s21)
-            return
-        elif evt == 'b':
-            self.transition(s211)
-            return
-        elif evt == 'g':
-            self.transition(s11)
-            return
+        elif evt.sig == test_evt:
+            if evt.arg == 'a':
+                self.transition(s21)
+                return
+            elif evt.arg == 'b':
+                self.transition(s211)
+                return
+            elif evt.arg == 'g':
+                self.transition(s11)
+                return
 
         # always return self.Super for unhandled events
         return self.Super
@@ -192,21 +203,22 @@ class s21(s2):
 
 class s211(s21):
     def state_handler(self, evt):
-        if evt == self.Init:
+        if evt.sig == self.Init:
             self.inited.append(s211)
             return
-        elif evt == self.Entry:
+        elif evt.sig == self.Entry:
             self.entered.append(s211)
             return
-        elif evt == self.Exit:
+        elif evt.sig == self.Exit:
             self.exited.append(s211)
             return
-        elif evt == 'd':
-            self.transition(s21)
-            return
-        elif evt == 'h':
-            self.transition(s)
-            return
+        elif evt.sig == test_evt:
+            if evt.arg == 'd':
+                self.transition(s21)
+                return
+            elif evt.arg == 'h':
+                self.transition(s)
+                return
 
         # always return self.Super for unhandled events
         return self.Super

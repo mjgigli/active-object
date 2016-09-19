@@ -33,24 +33,25 @@
 #
 
 import logging
+from event import event
 
 
-class Init(object):
+class Init(event):
     """Init signal for HSM Initial Transitions."""
     pass
 
 
-class Entry(object):
+class Entry(event):
     """Entry signal for HSM Entry events."""
     pass
 
 
-class Exit(object):
+class Exit(event):
     """Exit signal for HSM Exit events."""
     pass
 
 
-class Super(object):
+class Super(event):
     """Super signal used to pass up current signal to the Super State."""
     pass
 
@@ -65,8 +66,8 @@ class hsm(object):
 
     def __init__(self):
         """Dispatch Entry and Init signals at HSM creation."""
-        self.state_handler(Entry)
-        self.state_handler(Init)
+        self.state_handler(Entry())
+        self.state_handler(Init())
 
     def __repr__(self):
         return '%s()' % self.__class__.__name__
@@ -105,11 +106,11 @@ class hsm(object):
         for s in reversed(target_hierarchy):
             self.__class__ = s
             logging.debug("Enter: %s" % self)
-            self.state_handler(Entry)
+            self.state_handler(Entry())
 
         # take the initial transition
         self.__class__ = state
-        self.state_handler(Init)
+        self.state_handler(Init())
 
     def transition(self, state):
         """Perform state transition.
@@ -127,21 +128,21 @@ class hsm(object):
         # exit states until transition source
         while self.__class__ != self.__state:
             logging.debug("Exit: %s" % self)
-            self.state_handler(Exit)
+            self.state_handler(Exit())
             self.__class__ = next(self_hierarchy)
 
         if self.__class__ == state:
             # special case: transition to self
             logging.debug("Exit: %s" % self)
-            self.state_handler(Exit)
+            self.state_handler(Exit())
             logging.debug("Enter: %s" % self)
-            self.state_handler(Entry)
+            self.state_handler(Entry())
         else:
             # more complicated transition...
             # exit states until finding the least common ancestor
             while (self.__class__ not in target_hierarchy):
                 logging.debug("Exit: %s" % self)
-                self.state_handler(Exit)
+                self.state_handler(Exit())
                 self.__class__ = next(self_hierarchy)
 
             # enter the target state, if not already in target state
@@ -151,7 +152,7 @@ class hsm(object):
                 for state in reversed(transition_path):
                     self.__class__ = state
                     logging.debug("Entry: %s" % self)
-                    self.state_handler(Entry)
+                    self.state_handler(Entry())
 
         # finally, take the initial transition
-        self.state_handler(Init)
+        self.state_handler(Init())
