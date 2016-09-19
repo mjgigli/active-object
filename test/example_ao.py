@@ -36,7 +36,7 @@ test_sigs = [
 ]
 
 
-class test(ao.ao):
+class test(ao.active_object):
     def __init__(self, io_loop, cb=None):
         super(test, self).__init__(io_loop)
 

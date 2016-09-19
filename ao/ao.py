@@ -46,15 +46,15 @@ def publish(evt):
     dispatcher.publish(evt.sig, evt)
 
 
-class ao(hsm):
-    """ao class implements the active-object design pattern.
+class active_object(hsm):
+    """active_object class implements the active-object design pattern.
 
-    ao is a subclass of hsm, so application developers are expected to
-    implement state classes and state handler methods.
+    active_object is a subclass of hsm, so application developers are expected
+    to implement state classes and state handler methods.
     """
 
     def __init__(self, io_loop):
-        super(ao, self).__init__()
+        super(active_object, self).__init__()
 
         # active-object class members
         self._evt_q = Queue()
@@ -74,7 +74,7 @@ class ao(hsm):
         except Empty:
             logging.error("Active object event queue is empty.")
 
-        # dispatch event to ao's hsm
+        # dispatch event to active_object's hsm
         self.dispatch(evt)
 
         # cleanup if event was a stop event
