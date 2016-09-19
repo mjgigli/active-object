@@ -36,10 +36,21 @@
 class event(object):
     """The event class is the base class for hsm events.
 
-    The only member of the event class is the sig member, which can be used to
-    differentiate events from one another. The sig member will always be the
-    class type of the event.
-    """
+    The _sig class member can be overriden if the application developer wishes
+    the sig of the event to be something other than the type of the event. e.g.
+    they may wish to use a simple string as the sig, or some other object.
 
-    def __init__(self):
-        self.sig = self.__class__
+    The sig property can always be used to differentiate events from one
+    another. It will detect whether the _sig member has been overriden; if
+    it has, it will use the _sig value and if it hasn't it will return the
+    event class type.
+    """
+    def __init__(self, _sig=None):
+        self._sig = _sig
+
+    @property
+    def sig(self):
+        if self._sig is None:
+            return self.__class__
+        else:
+            return self._sig

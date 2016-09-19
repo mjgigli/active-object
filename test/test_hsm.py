@@ -33,7 +33,9 @@
 #
 
 import unittest
-from example import test_evt, test, s, s1, s11, s2, s21, s211
+
+import ao.event
+from example_hsm import test, s, s1, s11, s2, s21, s211
 
 
 def start_in_state(hsm_h, state):
@@ -58,53 +60,53 @@ class test_hsm(unittest.TestCase):
 
     def test_self_transition(self):
         start_in_state(self.test, s11)
-        self.test.dispatch(test_evt('a'))
+        self.test.dispatch(ao.event('a'))
         self.assertListEqual(self.test.inited, [s1, s11])
         self.assertListEqual(self.test.entered, [s1, s11])
         self.assertListEqual(self.test.exited, [s11, s1])
 
     def test_super_to_substate_transition(self):
         start_in_state(self.test, s11)
-        self.test.dispatch(test_evt('b'))
+        self.test.dispatch(ao.event('b'))
         self.assertListEqual(self.test.inited, [s11])
         self.assertListEqual(self.test.entered, [s11])
         self.assertListEqual(self.test.exited, [s11])
 
     def test_same_super_state_transition(self):
         start_in_state(self.test, s11)
-        self.test.dispatch(test_evt('c'))
+        self.test.dispatch(ao.event('c'))
         self.assertListEqual(self.test.inited, [s2, s211])
         self.assertListEqual(self.test.entered, [s2, s21, s211])
         self.assertListEqual(self.test.exited, [s11, s1])
 
     def test_substate_to_super_transition(self):
         start_in_state(self.test, s211)
-        self.test.dispatch(test_evt('d'))
+        self.test.dispatch(ao.event('d'))
         self.assertListEqual(self.test.inited, [s21, s211])
         self.assertListEqual(self.test.entered, [s211])
         self.assertListEqual(self.test.exited, [s211])
 
     def test_super_to_sub_substate_transition(self):
         start_in_state(self.test, s11)
-        self.test.dispatch(test_evt('e'))
+        self.test.dispatch(ao.event('e'))
         self.assertListEqual(self.test.inited, [s11])
         self.assertListEqual(self.test.entered, [s1, s11])
         self.assertListEqual(self.test.exited, [s11, s1])
 
     def test_same_super_to_substate_transition(self):
         start_in_state(self.test, s11)
-        self.test.dispatch(test_evt('f'))
+        self.test.dispatch(ao.event('f'))
         self.assertListEqual(self.test.inited, [s211])
         self.assertListEqual(self.test.entered, [s2, s21, s211])
         self.assertListEqual(self.test.exited, [s11, s1])
 
     def test_same_super_substate_to_substate_transition(self):
         start_in_state(self.test, s11)
-        self.test.dispatch(test_evt('g'))
+        self.test.dispatch(ao.event('g'))
         self.assertListEqual(self.test.inited, [s211])
         self.assertListEqual(self.test.entered, [s2, s21, s211])
         self.assertListEqual(self.test.exited, [s11, s1])
 
     def test_many_dispatches(self):
         for evt in 'giaddceegii':
-            self.test.dispatch(test_evt(evt))
+            self.test.dispatch(ao.event(evt))

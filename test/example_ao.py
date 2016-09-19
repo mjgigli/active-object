@@ -31,14 +31,8 @@
 import ao
 
 
-class test_evt(ao.event):
-    def __init__(self, arg):
-        super(test_evt, self).__init__()
-        self.arg = arg
-
-
-test_events = [
-    test_evt,
+test_sigs = [
+    'i',
 ]
 
 
@@ -54,22 +48,21 @@ class test(ao.ao):
             return
         elif evt.sig == self.Entry:
             # any ao initialization can go here
-            self.subscribe(test_events)
+            self.subscribe(test_sigs)
             self.foo = False
             return
         elif evt.sig == self.Stop:
             # any ao destruction can go here
-            self.unsubscribe(test_events)
+            self.unsubscribe(test_sigs)
 
 
 class s(test):
     def state_handler(self, evt):
-        if evt.sig == test_evt:
-            if evt.arg == 'i':
-                self.foo = True
-                if self.cb is not None:
-                    self.cb(evt)
-                return
+        if evt.sig == 'i':
+            self.foo = True
+            if self.cb is not None:
+                self.cb(evt)
+            return
 
         # always return self.Super for unhandled events
         return self.Super

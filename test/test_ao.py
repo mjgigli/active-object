@@ -31,7 +31,7 @@
 from tornado import testing
 
 import ao
-from example_ao import test_evt, test
+from example_ao import test
 
 
 class test_ao(testing.AsyncTestCase):
@@ -56,13 +56,13 @@ class test_ao(testing.AsyncTestCase):
 
     def test_direct_post(self):
         # verify that posting to event queue triggers ao's hsm
-        self.test.post(test_evt('i'))
+        self.test.post(ao.event('i'))
 
         evt = self.wait()
-        self.assertEqual(evt.arg, 'i')
+        self.assertEqual(evt.sig, 'i')
 
     def test_publish(self):
-        ao.publish(test_evt('i'))
+        ao.publish(ao.event('i'))
 
         evt = self.wait()
-        self.assertEqual(evt.arg, 'i')
+        self.assertEqual(evt.sig, 'i')
