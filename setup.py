@@ -8,4 +8,4 @@ setup(name='active-object',
       author='Matt Gigli',
       author_email='mjgigli@gmail.com',
       packages=['ao'],
-     )
+      )

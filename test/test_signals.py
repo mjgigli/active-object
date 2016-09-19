@@ -98,7 +98,6 @@ class test_signals(unittest.TestCase):
         self.assertEqual(self.cb_arg1, 'arg1')
         self.assertEqual(self.cb_arg2, 'arg2')
 
-
     def test_multiple_receivers(self):
         # verify test class members are reset
         self.assertEqual(self.cb1, 0)
